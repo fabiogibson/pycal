@@ -1,0 +1,22 @@
+system:
+  browser: brave
+
+layout:
+  show_header: true
+  show_footer: true
+
+calendars:
+  - Personal:
+      type: GoogleCalendar
+      credentials: ~/credentials/credentials-gmail.json
+
+agenda:
+  bindings:
+    select_next: j
+    select_previous: k
+    select_first: g
+    select_last: G
+    accept_event: a
+    join_meeting: o
+    refresh: r
+    quit: q
