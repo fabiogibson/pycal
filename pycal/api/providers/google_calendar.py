@@ -131,9 +131,11 @@ class GoogleCalendarAPI:
 class GoogleCalendar(BaseCalendar["GoogleEvent"]):
     @classmethod
     def from_settings(cls, name: str, config: Dict) -> "GoogleCalendar":
+        credentials_file = os.path.expanduser(config["credentials"])
+
         return cls(
             name,
-            service=GoogleCalendarAPI(config["credentials"]),
+            service=GoogleCalendarAPI(credentials_file),
             cache_manager=JsonCacheManager(
                 os.path.expanduser(
                     f"~/agenda.{name.lower().replace(' ', '_')}.json",
