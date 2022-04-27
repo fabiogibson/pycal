@@ -29,7 +29,7 @@ class CalendarView(Protocol):
     async def select_last(self, view: ScrollView) -> None:
         ...
 
-    async def reload_events(self) -> None:
+    def reload_events(self) -> None:
         ...
 
     def __rich__(self) -> Union[ConsoleRenderable, RichCast, str]:

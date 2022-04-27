@@ -56,7 +56,7 @@ class PyCalendar(App):
 
     async def action_refresh(self) -> None:
         """"""
-        await self.calendar_view.reload_events()
+        self.calendar_view.reload_events()
         await self.calendar_view.select_first(self.body)
 
     async def action_join_meeting(self) -> None:
