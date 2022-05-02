@@ -1,4 +1,3 @@
-import subprocess
 from mock.mock import AsyncMock, Mock, patch
 import pytest
 from pycal.app import PyCalendar
@@ -90,11 +89,10 @@ class TestApp:
         app.calendar_view.reload_events.assert_called_once()
         app.calendar_view.select_first.assert_called_once_with(app.body)
 
-    @patch("pycal.app.subprocess.run")
-    async def test_invoke_join_meeting(self, m_run):
+    async def test_invoke_join_meeting(self):
         # arrange
-        m_view = Mock()
-        m_view.selected.event.video_link = "some link"
+        m_view = AsyncMock()
+        m_view.selected = Mock()
         app = PyCalendar(calendar_view=m_view, config=Mock(browser="browser"))
 
         with patch.object(app, "action") as m_action:
@@ -102,10 +100,5 @@ class TestApp:
             await app.action_join_meeting()
 
         # assert
-        m_run.assert_called_once_with(
-            ["browser", "some link"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-
+        m_view.join_selected_event.assert_called_once()
         m_action.assert_called_once_with("quit")

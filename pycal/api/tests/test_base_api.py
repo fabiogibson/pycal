@@ -77,8 +77,9 @@ class TestEventStorage:
         m_calendar = Mock(spec=BaseCalendar)
         m_calendar.get_events.return_value = [m_event]
         m_calendar.name = "Mock Calendar"
+        m_config = Mock(calendars=[m_calendar])
 
-        storage = EventStorage([m_calendar])
+        storage = EventStorage(m_config)
         storage._events = init_state
 
         # act
@@ -91,8 +92,9 @@ class TestEventStorage:
         # arrange
         m_calendar = Mock(spec=BaseCalendar)
         m_calendar.name = "Mock Calendar"
+        m_config = Mock(calendars=[m_calendar])
 
-        storage = EventStorage([m_calendar])
+        storage = EventStorage(m_config)
         storage._events = {}
 
         # act

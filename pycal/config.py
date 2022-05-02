@@ -1,11 +1,12 @@
+from typing import TYPE_CHECKING, Callable, Dict, Generator
 import os
-from typing import Callable, Dict, Generator
 import yaml
-from pycal.api import BaseCalendar
-from pycal.api.providers.google_calendar import GoogleCalendar
 
 
-CalendarFactory = Callable[[str, Dict], BaseCalendar]
+if TYPE_CHECKING:
+    from pycal.api import BaseCalendar
+
+    CalendarFactory = Callable[[str, Dict], BaseCalendar]
 
 
 class Layout:
@@ -22,9 +23,7 @@ class Layout:
 
 
 class Config:
-    FACTORIES: Dict[str, CalendarFactory] = {
-        "GoogleCalendar": GoogleCalendar.from_settings,
-    }
+    FACTORIES: Dict[str, "CalendarFactory"] = {}
 
     @staticmethod
     def _read_file(file_path: str):
@@ -36,7 +35,7 @@ class Config:
         self._layout = Layout(self._config.get("layout", {}))
 
     @property
-    def calendars(self) -> Generator[BaseCalendar, None, None]:
+    def calendars(self) -> Generator["BaseCalendar", None, None]:
         for calendar in self._config["calendars"]:
             for name, config in calendar.items():
                 factory = self.FACTORIES[config["type"]]

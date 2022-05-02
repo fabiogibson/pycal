@@ -1,5 +1,3 @@
-import subprocess
-
 from textual.widgets import ScrollView, Header
 from textual.app import App
 from pycal.config import Config
@@ -61,17 +59,8 @@ class PyCalendar(App):
 
     async def action_join_meeting(self) -> None:
         """"""
-        if (
-            self.calendar_view.selected
-            and self.calendar_view.selected.event
-            and self.calendar_view.selected.event.video_link
-        ):
-            subprocess.run(
-                [self.config.browser, self.calendar_view.selected.event.video_link],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
-            await self.action("quit")
+        await self.calendar_view.join_selected_event()
+        await self.action("quit")
 
     async def action_accept_event(self) -> None:
         """"""

@@ -5,6 +5,7 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
+import subprocess
 from typing import (
     Any,
     Generic,
@@ -18,6 +19,8 @@ from typing import (
 )
 
 from arrow import Arrow
+
+from pycal.config import Config
 
 
 class EventStatus(str, Enum):
@@ -105,8 +108,9 @@ class BaseCalendar(ABC, Generic[T]):
 
 
 class EventStorage:
-    def __init__(self, calendars: List[BaseCalendar]):
-        self.calendars = calendars
+    def __init__(self, config: Config):
+        self.config = config
+        self.calendars = config.calendars
         self._events: Optional[Dict[str, Iterable[Event]]] = None
 
     def _merge_events(self, event_lists: Iterable[Iterable[Event]]):
@@ -132,3 +136,19 @@ class EventStorage:
             self._events = {c.name: c.get_events(ignore_cache) for c in self.calendars}
 
         return self._merge_events(self._events.values())
+
+    def get_closest_event(self) -> Event:
+        now = Arrow.now()
+
+        return min(
+            self.get_events(),
+            key=lambda e: abs((now - e.start_time).total_seconds()),
+        )
+
+    def join_event(self, event: Event) -> None:
+        if event.video_link:
+            subprocess.run(
+                [self.config.browser, event.video_link],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )

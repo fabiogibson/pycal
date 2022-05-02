@@ -29,6 +29,9 @@ class CalendarView(Protocol):
     async def select_last(self, view: ScrollView) -> None:
         ...
 
+    async def join_selected_event(self) -> None:
+        ...
+
     def reload_events(self) -> None:
         ...
 

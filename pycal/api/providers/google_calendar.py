@@ -26,7 +26,9 @@ class GoogleEventStatus(Enum):
 
 
 class GoogleCredentials:
-    SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
+    SCOPES = [
+        "https://www.googleapis.com/auth/calendar.events",
+    ]
 
     def __init__(self, credentials_file: str):
         self.credentials_file = credentials_file

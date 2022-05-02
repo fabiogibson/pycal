@@ -82,6 +82,10 @@ class Agenda(Widget):
             scroll_y = scroll_view.y - scroll_view.max_scroll_y // self.rows - 1
             self.select(self.selected.previous, scroll_view, 0, scroll_y)
 
+    async def join_selected_event(self) -> None:
+        if self.selected:
+            self.storage.join_event(self.selected.event)
+
     def add_event(self, event: Event) -> None:
         event_widget = EventWidget(event)
         self.events[event.start_time.date()].append(event_widget)

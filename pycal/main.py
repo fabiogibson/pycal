@@ -3,16 +3,19 @@ import click
 import arrow
 
 from pycal import views
-from pycal.api import EventStorage
-from pycal.app import PyCalendar
 from pycal.config import Config
+from pycal.api import EventStorage
+from pycal.api.providers.google_calendar import GoogleCalendar
+
+from pycal.app import PyCalendar
 
 
 @click.group()
 @click.pass_context
 def cli(ctx):
     config = Config()
-    storage = EventStorage(list(config.calendars))
+    config.FACTORIES["GoogleCalendar"] = GoogleCalendar.from_settings
+    storage = EventStorage(config)
     ctx.ensure_object(dict)
     ctx.obj["config"] = config
     ctx.obj["storage"] = storage
@@ -32,15 +35,14 @@ def agenda(ctx):
 
 @click.command()
 @click.pass_context
-def next(ctx):
+@click.option(
+    "--join", default=False, is_flag=True, help="Remotely join the closest event."
+)
+def next(ctx, join):
     storage = ctx.obj["storage"]
+    closest_event = storage.get_closest_event()
 
-    next_event = min(
-        storage.get_events(),
-        key=lambda e: abs((arrow.now() - e.start_time).total_seconds()),
-    )
-
-    if not next_event or abs((arrow.now() - next_event.start_time).days) > 1:
+    if not closest_event or abs((arrow.now() - closest_event.start_time).days) > 1:
         click.echo("No upcoming events")
         return
 
@@ -48,12 +50,15 @@ def next(ctx):
         "minute",
     ]
 
-    if abs(next_event.start_time - arrow.now()).total_seconds() / 60 >= 60:
+    if abs(closest_event.start_time - arrow.now()).total_seconds() / 60 >= 60:
         granularity.append("hour")
 
     click.echo(
-        f"{next_event.start_time.humanize(granularity=granularity)} - {next_event.title}"
+        f"{closest_event.start_time.humanize(granularity=granularity)} - {closest_event.title}"
     )
+
+    if join:
+        storage.join_event(closest_event)
 
 
 cli.add_command(agenda)
