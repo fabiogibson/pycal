@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Callable, Dict, Generator
+from typing import TYPE_CHECKING, Callable, Dict, Generator, List
 import os
 import yaml
 
@@ -33,13 +33,17 @@ class Config:
     def __init__(self):
         self._config = self._read_file(os.path.expanduser("~/.pycal.yml"))
         self._layout = Layout(self._config.get("layout", {}))
+        self._calendars: List[BaseCalendar] = []
 
     @property
-    def calendars(self) -> Generator["BaseCalendar", None, None]:
-        for calendar in self._config["calendars"]:
-            for name, config in calendar.items():
-                factory = self.FACTORIES[config["type"]]
-                yield factory(name, config)
+    def calendars(self) -> List["BaseCalendar"]:
+        if not self._calendars:
+            for calendar in self._config["calendars"]:
+                for name, config in calendar.items():
+                    factory = self.FACTORIES[config["type"]]
+                    self._calendars.append(factory(name, config))
+
+        return self._calendars
 
     @property
     def layout(self) -> Layout:

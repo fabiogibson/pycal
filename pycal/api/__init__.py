@@ -137,11 +137,11 @@ class EventStorage:
 
         return self._merge_events(self._events.values())
 
-    def get_closest_event(self) -> Event:
+    def get_closest_event(self, ignore_cache: bool = False) -> Event:
         now = Arrow.now()
 
         return min(
-            self.get_events(),
+            self.get_events(ignore_cache),
             key=lambda e: abs((now - e.start_time).total_seconds()),
         )
 

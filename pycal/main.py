@@ -8,6 +8,7 @@ from pycal.api import EventStorage
 from pycal.api.providers.google_calendar import GoogleCalendar
 
 from pycal.app import PyCalendar
+from pycal.views.agenda import Agenda
 
 
 @click.group()
@@ -38,9 +39,10 @@ def agenda(ctx):
 @click.option(
     "--join", default=False, is_flag=True, help="Remotely join the closest event."
 )
-def next(ctx, join):
+@click.option("--nocache", default=False, is_flag=True, help="Ignore local cache.")
+def next(ctx, join, nocache):
     storage = ctx.obj["storage"]
-    closest_event = storage.get_closest_event()
+    closest_event = storage.get_closest_event(nocache)
 
     if not closest_event or abs((arrow.now() - closest_event.start_time).days) > 1:
         click.echo("No upcoming events")
